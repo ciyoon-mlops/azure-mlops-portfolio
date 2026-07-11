@@ -19,10 +19,20 @@ This portfolio showcases my hands-on learning journey in Azure MLOps and generat
 
 | Project | Description | Key Azure Services | Status |
 |---------|-------------|--------------------|--------|
-| **RAG Demo** | Retrieval-Augmented Generation app using enterprise documents | Azure AI Search, Azure OpenAI, Embeddings | Planned |
+| **RAG Demo** ([`rag-demo/azure-rag-cli`](rag-demo/azure-rag-cli)) | End-to-end RAG CLI: PDF → chunk/embed → Azure AI Search → vector Q&A with Azure OpenAI | Azure AI Search, Azure OpenAI | Completed |
 | **AI Search Pipeline** | Custom vector search index with semantic ranking | Azure AI Search, Cognitive Services | Planned |
 | **MLOps End-to-End** | Full ML lifecycle: data prep → training → registry → deployment → monitoring | Azure Machine Learning, GitHub Actions CI/CD | Planned |
 | **Model Monitoring** | Drift detection and automated retraining demo | Azure ML Monitoring, Pipelines | Planned |
+
+### Recent updates — `rag-demo/azure-rag-cli`
+
+Python CLI for a full Azure RAG pipeline:
+
+1. **create** — Extract text from a PDF, chunk it, and generate embeddings with Azure OpenAI
+2. **upload** — Create an Azure AI Search index and upload embedded documents
+3. **query** — Run vector search and answer questions with Azure OpenAI chat
+
+See [`rag-demo/azure-rag-cli/README.md`](rag-demo/azure-rag-cli/README.md) for setup, configuration, and usage.
 
 ## Architecture Overview
 (Planned)

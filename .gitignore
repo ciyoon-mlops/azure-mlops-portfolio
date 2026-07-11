@@ -205,3 +205,6 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# RAG Demo PDF files
+./rag-demo/azure-rag-cli/docs/sayno_230405.pdf
