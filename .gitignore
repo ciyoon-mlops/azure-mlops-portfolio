@@ -206,5 +206,11 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
+# macOS
+.DS_Store
+
 # RAG Demo PDF files
-./rag-demo/azure-rag-cli/docs/sayno_230405.pdf
+rag-demo/azure-rag-cli/docs/sayno_230405.pdf
+
+# RAG Demo output files
+rag-demo/azure-rag-cli/output/
