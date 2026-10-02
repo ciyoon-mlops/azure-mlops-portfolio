@@ -11,6 +11,7 @@
 I hold the following certifications:
 - Microsoft Azure AI Fundamentals (AI-900)
 - Microsoft Azure AI Engineer Associate (AI-102)
+- Microsoft Azure Fundamentals (AZ-900)
 - KT AICE Professional
 
 This portfolio showcases my hands-on learning journey in Azure MLOps and generative AI solutions.
@@ -34,7 +35,7 @@ Python CLI for a full Azure RAG pipeline:
 
 See [`rag-demo/azure-rag-cli/README.md`](rag-demo/azure-rag-cli/README.md) for setup, configuration, and usage.
 
-### Recent updates — Azure ML training job
+### Recent updates — MLOps End-to-End
 
 Current hands-on progress:
 
@@ -42,14 +43,17 @@ Current hands-on progress:
 - Created an `MLClient`
 - Created and used an Azure ML Compute Cluster
 - Configured a custom Environment
-- Successfully executed a Custom Training Job using `command()`
-- Verified job execution and artifacts in Azure ML Studio
-
+- Defined a Custom Training Job using `command()`
+- Submitted the job programmatically using `ml_client.jobs.create_or_update()`
+- Successfully completed the Training Job
+- Verified the `accuracy` metric and `model` artifact in Azure ML Studio
+- Built and submitted a single-step Azure ML Pipeline
+- Successfully completed the Pipeline and its `train` step
+- Verified the `accuracy` metric and `model` artifact from the pipeline run
 Next:
 
-- Submit jobs programmatically with `ml_client.jobs.create_or_update()`
-- Register trained model
-- Build an Azure ML pipeline
+- Extend the pipeline with an evaluation step
+- Register the trained model
 
 ## Architecture Overview
 (Planned)
