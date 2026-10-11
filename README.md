@@ -22,7 +22,7 @@ This portfolio showcases my hands-on learning journey in Azure MLOps and generat
 |---------|-------------|--------------------|--------|
 | **RAG Demo** ([`rag-demo/azure-rag-cli`](rag-demo/azure-rag-cli)) | End-to-end RAG CLI: PDF → chunk/embed → Azure AI Search → vector Q&A with Azure OpenAI | Azure AI Search, Azure OpenAI | Completed |
 | **AI Search Pipeline** | Custom vector search index with semantic ranking | Azure AI Search, Cognitive Services | Planned |
-| **MLOps End-to-End** | Full ML lifecycle: data prep → training → registry → deployment → monitoring | Azure Machine Learning, GitHub Actions CI/CD | In Progress |
+| **MLOps End-to-End** ([`mlops-pipeline`](mlops-pipeline)) | Full ML lifecycle: data prep → training → registry → deployment → monitoring | Azure Machine Learning, GitHub Actions CI/CD | In Progress |
 | **Model Monitoring** | Drift detection and automated retraining demo | Azure ML Monitoring, Pipelines | Planned |
 
 ### Recent updates — `rag-demo/azure-rag-cli`
@@ -35,7 +35,7 @@ Python CLI for a full Azure RAG pipeline:
 
 See [`rag-demo/azure-rag-cli/README.md`](rag-demo/azure-rag-cli/README.md) for setup, configuration, and usage.
 
-### Recent updates — MLOps End-to-End
+### Recent updates — `mlops-pipeline`
 
 Current hands-on progress:
 
@@ -47,13 +47,16 @@ Current hands-on progress:
 - Submitted the job programmatically using `ml_client.jobs.create_or_update()`
 - Successfully completed the Training Job
 - Verified the `accuracy` metric and `model` artifact in Azure ML Studio
-- Built and submitted a single-step Azure ML Pipeline
-- Successfully completed the Pipeline and its `train` step
-- Verified the `accuracy` metric and `model` artifact from the pipeline run
+- Built and submitted an Azure ML Pipeline that connects a train step to an evaluate step
+- Successfully completed the Pipeline and its `train` and `evaluate` steps
+- Verified the `accuracy` metric and `model` artifact from the train step
+- Verified the `eval_accuracy` metric from the evaluate step
+
 Next:
 
-- Extend the pipeline with an evaluation step
 - Register the trained model
+
+See [`mlops-pipeline/README.md`](mlops-pipeline/README.md) for setup, configuration, and usage.
 
 ## Architecture Overview
 (Planned)

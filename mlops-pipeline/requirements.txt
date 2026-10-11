@@ -1,0 +1,5 @@
+python-dotenv
+azure-ai-ml
+azure-identity
+mlflow
+scikit-learn
