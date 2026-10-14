@@ -239,7 +239,6 @@ Set the missing variable.
 Run `az login`.
 Use an account that can access the workspace.
 Confirm the subscription, resource group, and workspace name in `.env`.
-
 **The single job fails on `--model_output`**
 
 `11_submit_jobs.py` runs `python train.py`.
@@ -247,3 +246,4 @@ Confirm the subscription, resource group, and workspace name in `.env`.
 `13_submit_pipeline.py` passes `--model_output`.
 `11_submit_jobs.py` does not pass that argument.
 Use the pipeline script when you need a completed training run.
+

@@ -1,4 +1,4 @@
-from azure.ai.ml import command
+from azure.ai.ml import Output, command
 
 from azure_config import (
     compute_name,
@@ -13,7 +13,10 @@ ml_client = create_ml_client()
 
 job = command(
     code=training_code_path(),
-    command="python train.py",
+    command="python train.py --model_output ${{outputs.model_output}}",
+    outputs={
+        "model_output": Output(type="uri_folder"),
+    },
     environment=ml_environment(),
     compute=compute_name(),
     experiment_name=experiment_name(),
