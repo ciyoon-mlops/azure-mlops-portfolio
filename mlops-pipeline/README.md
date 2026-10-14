@@ -48,7 +48,9 @@ Run each script from `mlops-pipeline`.
 Do not set `PYTHONPATH`.
 
 `requirements.txt` installs the packages that submit a job.
+It also installs MLflow and scikit-learn.
 `train.py` and `evaluate.py` run on the compute cluster.
+The local virtual environment does not supply those packages to the job.
 The compute environment supplies scikit-learn and MLflow.
 The environment name is `sklearn-1.5`, version 53.
 
@@ -64,8 +66,9 @@ cp .env.example .env
 Do not commit `.env`.
 `.gitignore` already lists `.env`.
 
-Every variable in the tables is required.
-A script stops when a required variable is missing.
+Set every variable in the tables.
+Each script reads only the variables it uses.
+A script stops when one of those variables is missing.
 The error message names that variable.
 
 ### Workspace variables
@@ -96,6 +99,9 @@ Set a different value when the example does not fit your workspace.
 | `AZURE_EXPERIMENT_NAME`     | `sdk-v2-training`                                                            | Experiment name                      |
 | `AZURE_JOB_DISPLAY_NAME`    | `sdk-v2-mlflow-artifact-test`                                                | Display name for the single job      |
 
+Every script reads the three workspace variables and `AZURE_COMPUTE_NAME`.
+`01_create_compute.py` reads the compute size, the node counts, and the idle seconds.
+`11_submit_jobs.py` and `13_submit_pipeline.py` read `AZURE_ML_ENVIRONMENT` and `AZURE_EXPERIMENT_NAME`.
 `11_submit_jobs.py` is the only script that reads `AZURE_JOB_DISPLAY_NAME`.
 
 ## Usage
@@ -120,8 +126,16 @@ Azure ML scales the cluster down after 120 idle seconds.
 ### 2. Submit one training job
 
 This script submits one command job.
-The job command is `python train.py`.
 The job uses `AZURE_JOB_DISPLAY_NAME`.
+The job runs this command:
+
+```text
+python train.py --model_output ${{outputs.model_output}}
+```
+
+`train.py` requires `--model_output`.
+The job writes a model folder.
+The folder type is `uri_folder`.
 
 ```bash
 python 11_submit_jobs.py
@@ -131,10 +145,9 @@ The script prints the job name.
 The script prints the Studio URL.
 The script waits until the job ends.
 
-`train.py` requires `--model_output`.
-This script does not pass `--model_output`.
-The job fails when that argument is missing.
-Read Troubleshooting before you run this script.
+Open the job in Azure ML Studio.
+Check the `accuracy` metric.
+Check the model artifact.
 
 ### 3. Submit the pipeline
 
@@ -239,11 +252,4 @@ Set the missing variable.
 Run `az login`.
 Use an account that can access the workspace.
 Confirm the subscription, resource group, and workspace name in `.env`.
-**The single job fails on `--model_output`**
-
-`11_submit_jobs.py` runs `python train.py`.
-`train.py` requires `--model_output`.
-`13_submit_pipeline.py` passes `--model_output`.
-`11_submit_jobs.py` does not pass that argument.
-Use the pipeline script when you need a completed training run.
 

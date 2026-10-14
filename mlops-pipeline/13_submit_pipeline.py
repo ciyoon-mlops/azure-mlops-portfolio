@@ -1,11 +1,10 @@
-"""Submit an Azure ML pipeline with one training step.
+"""Submit an Azure ML pipeline with a train step and an evaluate step.
 
-Run this file from the project root.
-The project root contains azure_config.py and the src folder.
-The required files are azure_config.py and src/train.py.
-The command is python submit_pipeline.py.
+Run this file from the mlops-pipeline directory.
+The directory contains azure_config.py and the src folder.
+The required files are azure_config.py, src/train.py, and src/evaluate.py.
+The command is python 13_submit_pipeline.py.
 This code does not register the model.
-This code does not include an evaluate step.
 """
 
 from pathlib import Path
@@ -22,10 +21,12 @@ from azure_config import (
 
 def main():
     # Check the code folder.
-    # Stop the submission if the train file is missing.
+    # Stop the submission if a required file is missing.
     code_dir = Path(__file__).resolve().parent / "src"
     if not (code_dir / "train.py").is_file():
         raise FileNotFoundError(f"Train file not found: {code_dir / 'train.py'}")
+    if not (code_dir / "evaluate.py").is_file():
+        raise FileNotFoundError(f"Evaluate file not found: {code_dir / 'evaluate.py'}")
 
     # Create the workspace client from the current settings.
     ml_client = create_ml_client()
@@ -62,7 +63,7 @@ def main():
     )    
 
     # Convert the function into a pipeline definition.
-    @dsl.pipeline(description="Train the Iris model in a single-step pipeline")
+    @dsl.pipeline(description="Train and evaluate the Iris model")
     def training_pipeline():
         # Add the training job as a pipeline step.
         # This line looks like a Python function call.
@@ -100,8 +101,7 @@ def main():
         print(f"Step: {step.display_name or step.name}, status: {step.status}")
 
     # In Studio, check the accuracy and the model artifact of the train step.
-    # This pipeline does not yet have an output that passes the model between steps.
-    # Add model_output and an evaluate step in the next exercise.
+    # Check the eval_accuracy metric of the evaluate step.
     # After the run, check the compute node count and Cost Management.
     # min_instances=0 is a compute setting.
     # This file does not change that setting.
