@@ -220,3 +220,6 @@ rag-demo/azure-rag-cli/docs/sayno_230405.pdf
 
 # RAG Demo output files
 rag-demo/azure-rag-cli/output/
+
+# Downloaded model artifacts
+mlops-pipeline/downloaded_model/
