@@ -51,10 +51,7 @@ Current hands-on progress:
 - Successfully completed the Pipeline and its `train` and `evaluate` steps
 - Verified the `accuracy` metric and `model` artifact from the train step
 - Verified the `eval_accuracy` metric from the evaluate step
-
-Next:
-
-- Register the trained model
+- Registered the trained model from the train step output as `iris-random-forest`
 
 See [`mlops-pipeline/README.md`](mlops-pipeline/README.md) for setup, configuration, and usage.
 

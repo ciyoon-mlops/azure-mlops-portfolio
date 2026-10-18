@@ -5,6 +5,7 @@ The directory contains azure_config.py and the src folder.
 The required files are azure_config.py, src/train.py, and src/evaluate.py.
 The command is python 13_submit_pipeline.py.
 This code does not register the model.
+Run 14_register_model.py after this script.
 """
 
 from pathlib import Path

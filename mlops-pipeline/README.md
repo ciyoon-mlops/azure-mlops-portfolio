@@ -5,7 +5,8 @@ This project submits an Azure ML training pipeline from Python.
 1. Create a compute cluster.
 2. Submit one training job.
 3. Submit a pipeline that trains a model and evaluates the model.
-4. Delete the compute cluster.
+4. Register the trained model.
+5. Delete the compute cluster.
 
 ## Prerequisites
 
@@ -99,9 +100,11 @@ Set a different value when the example does not fit your workspace.
 | `AZURE_EXPERIMENT_NAME`     | `sdk-v2-training`                                                            | Experiment name                      |
 | `AZURE_JOB_DISPLAY_NAME`    | `sdk-v2-mlflow-artifact-test`                                                | Display name for the single job      |
 
-Every script reads the three workspace variables and `AZURE_COMPUTE_NAME`.
+`01_create_compute.py`, `11_submit_jobs.py`, `13_submit_pipeline.py`, and `21_del_compute.py` read `AZURE_COMPUTE_NAME`.
 `01_create_compute.py` reads the compute size, the node counts, and the idle seconds.
 `11_submit_jobs.py` and `13_submit_pipeline.py` read `AZURE_ML_ENVIRONMENT` and `AZURE_EXPERIMENT_NAME`.
+`14_register_model.py` reads the three workspace variables.
+`14_register_model.py` reads `AZURE_EXPERIMENT_NAME` when you omit `--train-job-name`.
 `11_submit_jobs.py` is the only script that reads `AZURE_JOB_DISPLAY_NAME`.
 
 ## Usage
@@ -157,7 +160,12 @@ This script submits a pipeline with two steps.
 python 13_submit_pipeline.py
 ```
 
-The train step name is `iris_train`.
+The train component name is `iris_train`.
+The train step display name is `train_step`.
+The display name comes from the Python variable in the pipeline function.
+`14_register_model.py` looks for `train_step`.
+The script prints the pipeline job name.
+That name is the parent job name.
 The train step runs this command:
 
 ```text
@@ -198,6 +206,32 @@ The code logs that model artifact with `mlflow.log_artifacts`.
 The code does not call `mlflow.sklearn.log_model`.
 Azure ML tracking does not support that API.
 
+### 4. Register the model
+
+Run this script after the pipeline ends.
+
+```bash
+python 14_register_model.py
+```
+
+The script reads `AZURE_EXPERIMENT_NAME`.
+The script selects the latest completed pipeline in that experiment.
+The script selects the completed step whose display name is `train_step`.
+
+Pass a training step job name when you do not want the latest step.
+
+```bash
+python 14_register_model.py --train-job-name <train-step-job-name>
+```
+
+The script downloads the `model_output` folder to `downloaded_model/`.
+`.gitignore` already lists `downloaded_model/`.
+The script finds the folder that contains `MLmodel`.
+The script registers that folder.
+The model name is `iris-random-forest`.
+The script prints the model name and the model version.
+The same model name creates a new version.
+
 ## Project layout
 
 ```text
@@ -209,6 +243,7 @@ mlops-pipeline/
   01_create_compute.py       # Creates the compute cluster
   11_submit_jobs.py          # Submits one training job
   13_submit_pipeline.py      # Submits the train step and the evaluate step
+  14_register_model.py      # Registers the model from the train step
   21_del_compute.py          # Deletes the compute cluster
   src/
     train.py                 # Trains the Iris model
@@ -224,6 +259,7 @@ flowchart LR
   Pipeline[13_submit_pipeline] --> Train[iris_train]
   Train --> ModelFolder[model folder]
   ModelFolder --> Evaluate[iris_evaluate]
+  ModelFolder --> Register[14_register_model]
   Delete[21_del_compute] --> Compute
 ```
 
