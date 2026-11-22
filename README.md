@@ -52,6 +52,10 @@ Current hands-on progress:
 - Verified the `accuracy` metric and `model` artifact from the train step
 - Verified the `eval_accuracy` metric from the evaluate step
 - Registered the trained model from the train step output as `iris-random-forest`
+- Added `azureml-ai-monitoring` and `azureml-inference-server-http` to the registered model so online scoring can import `azureml.ai.monitoring`
+- Deployed the latest `iris-random-forest` model to a managed online endpoint (`blue` deployment, `Standard_D4as_v4`)
+- Invoked the endpoint with one Iris sample
+- Deleted the online endpoint after testing
 
 See [`mlops-pipeline/README.md`](mlops-pipeline/README.md) for setup, configuration, and usage.
 

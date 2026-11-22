@@ -82,6 +82,38 @@ def download_model_directory(ml_client, train_job_name: str) -> Path:
     return mlmodel_files[0].parent
 
 
+# The online scoring script imports azureml.ai.monitoring.
+# The training output does not include that package.
+INFERENCE_PACKAGES = (
+    "azureml-ai-monitoring",
+    "azureml-inference-server-http",
+)
+
+
+def add_inference_packages(model_dir: Path) -> None:
+    conda_path = model_dir / "conda.yaml"
+    conda_lines = conda_path.read_text().splitlines()
+    conda_text = "\n".join(conda_lines)
+    insert_at = next(
+        index for index, line in enumerate(conda_lines) if line.startswith("name:")
+    )
+    for package in INFERENCE_PACKAGES:
+        if package not in conda_text:
+            conda_lines.insert(insert_at, f"  - {package}")
+            insert_at += 1
+    conda_path.write_text("\n".join(conda_lines) + "\n")
+
+    requirements_path = model_dir / "requirements.txt"
+    requirement_lines = [
+        line for line in requirements_path.read_text().splitlines() if line.strip()
+    ]
+    package_names = {line.split("==", 1)[0].strip() for line in requirement_lines}
+    for package in INFERENCE_PACKAGES:
+        if package not in package_names:
+            requirement_lines.append(package)
+    requirements_path.write_text("\n".join(requirement_lines) + "\n")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -97,6 +129,7 @@ def main():
 
     model_dir = download_model_directory(ml_client, train_job_name)
     print(f"MLmodel directory: {model_dir}")
+    add_inference_packages(model_dir)
 
     model = Model(
         name="iris-random-forest",

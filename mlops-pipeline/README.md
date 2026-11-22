@@ -1,18 +1,23 @@
 # Azure ML Pipeline
 
 This project submits an Azure ML training pipeline from Python.
+It registers the trained model and deploys that model to an online endpoint.
 
 1. Create a compute cluster.
 2. Submit one training job.
 3. Submit a pipeline that trains a model and evaluates the model.
 4. Register the trained model.
-5. Delete the compute cluster.
+5. Deploy the model to an online endpoint.
+6. Invoke the online endpoint.
+7. Delete the online endpoint and the compute cluster.
 
 ## Prerequisites
 
 - Python 3.10 or later
 - An [Azure Machine Learning](https://learn.microsoft.com/azure/machine-learning/) workspace
 - Permission to create a compute cluster and submit a job in that workspace
+- Permission to create, invoke, and delete a managed online endpoint in that workspace
+- Quota for one `Standard_D4as_v4` instance (8 DASv4 cores)
 - An Azure CLI login for `DefaultAzureCredential`
 
 The scripts use `DefaultAzureCredential`.
@@ -105,6 +110,9 @@ Set a different value when the example does not fit your workspace.
 `11_submit_jobs.py` and `13_submit_pipeline.py` read `AZURE_ML_ENVIRONMENT` and `AZURE_EXPERIMENT_NAME`.
 `14_register_model.py` reads the three workspace variables.
 `14_register_model.py` reads `AZURE_EXPERIMENT_NAME` when you omit `--train-job-name`.
+`15_deploy_endpoint.py`, `16_invoke_endpoint.py`, and `23_del_deploy.py` read the three workspace variables.
+Those three scripts do not read compute variables or job variables.
+The endpoint name, the deployment name, and the VM size are set in those Python files.
 `11_submit_jobs.py` is the only script that reads `AZURE_JOB_DISPLAY_NAME`.
 
 ## Usage
@@ -227,10 +235,62 @@ python 14_register_model.py --train-job-name <train-step-job-name>
 The script downloads the `model_output` folder to `downloaded_model/`.
 `.gitignore` already lists `downloaded_model/`.
 The script finds the folder that contains `MLmodel`.
+The script adds `azureml-ai-monitoring` to `conda.yaml` in that folder.
+The script adds `azureml-inference-server-http` to `conda.yaml` in that folder.
+The script adds the same two packages to `requirements.txt` in that folder.
+The online scoring script imports `azureml.ai.monitoring`.
+The training output does not include that package.
 The script registers that folder.
 The model name is `iris-random-forest`.
 The script prints the model name and the model version.
 The same model name creates a new version.
+
+### 5. Deploy the model
+
+Run this script after the model is registered.
+
+```bash
+python 15_deploy_endpoint.py
+```
+
+The script gets the `latest` version of `iris-random-forest`.
+The endpoint name is `iris-thomas-20261024`.
+The authentication mode is `key`.
+The deployment name is `blue`.
+The VM size is `Standard_D4as_v4`.
+The instance count is 1.
+`Dsv6`, `Dsv7`, and `DSv4` are not online-endpoint SKUs.
+`DSv2` is end of life.
+`Standard_D4as_v4` is a supported online-endpoint SKU.
+This size needs 8 DASv4 cores.
+The script creates the endpoint.
+The script creates the deployment.
+Azure provisions a VM and prepares the model environment.
+This step takes several minutes.
+The script routes 100% of endpoint traffic to `blue`.
+The script prints the endpoint name, the deployment name, and the provisioning state.
+The training compute cluster is not used for this deployment.
+
+Use the same endpoint name in `15_deploy_endpoint.py`, `16_invoke_endpoint.py`, and `23_del_deploy.py`.
+Change that name in all three files together.
+
+### 6. Invoke the endpoint
+
+Run this script after the deployment is ready.
+
+```bash
+python 16_invoke_endpoint.py
+```
+
+The script sends one Iris sample to the `blue` deployment.
+The values are sepal length, sepal width, petal length, and petal width.
+
+```text
+[5.1, 3.5, 1.4, 0.2]
+```
+
+The script writes that request to a temporary JSON file.
+The script prints the response.
 
 ## Project layout
 
@@ -243,8 +303,11 @@ mlops-pipeline/
   01_create_compute.py       # Creates the compute cluster
   11_submit_jobs.py          # Submits one training job
   13_submit_pipeline.py      # Submits the train step and the evaluate step
-  14_register_model.py      # Registers the model from the train step
+  14_register_model.py       # Registers the model from the train step
+  15_deploy_endpoint.py      # Deploys the model to an online endpoint
+  16_invoke_endpoint.py      # Sends one sample to the online endpoint
   21_del_compute.py          # Deletes the compute cluster
+  23_del_deploy.py           # Deletes the online endpoint
   src/
     train.py                 # Trains the Iris model
     evaluate.py              # Evaluates the saved model
@@ -260,10 +323,24 @@ flowchart LR
   Train --> ModelFolder[model folder]
   ModelFolder --> Evaluate[iris_evaluate]
   ModelFolder --> Register[14_register_model]
+  Register --> RegisteredModel[iris-random-forest]
+  RegisteredModel --> Deploy[15_deploy_endpoint]
+  Deploy --> Endpoint[online endpoint]
+  Endpoint --> Invoke[16_invoke_endpoint]
+  DeleteEndpoint[23_del_deploy] --> Endpoint
   Delete[21_del_compute] --> Compute
 ```
 
 ## Cleanup
+
+Delete the online endpoint when you finish the test.
+The endpoint is billed separately from the compute cluster.
+
+```bash
+python 23_del_deploy.py
+```
+
+The script deletes the endpoint and its deployments.
 
 Delete the compute cluster when you finish the work.
 
