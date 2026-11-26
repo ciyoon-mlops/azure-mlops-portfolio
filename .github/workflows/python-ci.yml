@@ -1,0 +1,63 @@
+name: MLOps Python CI
+
+# Run when relevant files change.
+on:
+  push:
+    paths:
+      - "mlops-pipeline/**"
+      - ".github/workflows/python-ci.yml"
+  pull_request:
+    paths:
+      - "mlops-pipeline/**"
+      - ".github/workflows/python-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  syntax-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      # Download the repository into the runner.
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Use the same Python version for each run.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      # Compile source files without executing the scripts.
+      - name: Check Python syntax
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import py_compile
+
+          root = Path("mlops-pipeline")
+          if not root.is_dir():
+              raise SystemExit("mlops-pipeline directory was not found.")
+
+          excluded = {
+              ".venv", "venv", "__pycache__",
+              "downloaded_model", ".git",
+          }
+
+          files = sorted(
+              path
+              for path in root.rglob("*.py")
+              if not excluded.intersection(path.relative_to(root).parts)
+          )
+
+          if not files:
+              raise SystemExit("No Python files were found.")
+
+          for path in files:
+              print(f"Checking: {path}", flush=True)
+              py_compile.compile(str(path), doraise=True)
+
+          print(f"Syntax check passed: {len(files)} files.")
+          PY
