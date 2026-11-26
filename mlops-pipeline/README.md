@@ -14,6 +14,10 @@ It registers the trained model and deploys that model to an online endpoint.
 ## Prerequisites
 
 - Python 3.10 or later
+  `.github/workflows/python-ci.yml` at the repository root checks Python syntax in this directory.
+  It uses Python 3.10.
+  It runs when files in `mlops-pipeline` change.
+  It compiles the files and does not install packages, run the scripts, or call Azure.
 - An [Azure Machine Learning](https://learn.microsoft.com/azure/machine-learning/) workspace
 - Permission to create a compute cluster and submit a job in that workspace
 - Permission to create, invoke, and delete a managed online endpoint in that workspace
